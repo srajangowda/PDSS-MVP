@@ -21,12 +21,12 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleDemoLogin = async (role: 'parent' | 'health_worker' | 'specialist') => {
+  const handleDemoLogin = async (role: 'parent' | 'doctor' | 'admin') => {
     setError(null);
     try {
       await loginWithDemo(role);
-      if (role === 'specialist') {
-        navigate('/specialist/dashboard');
+      if (role === 'doctor') {
+        navigate('/doctor/dashboard');
       } else {
         navigate('/dashboard');
       }
@@ -68,19 +68,19 @@ export const LoginPage: React.FC = () => {
           </button>
           <button
             type="button"
-            onClick={() => handleDemoLogin('health_worker')}
-            className="p-2.5 bg-white hover:bg-teal-50 border border-amber-200 hover:border-teal-300 rounded-xl text-xs font-bold text-slate-800 hover:text-teal-900 transition flex flex-col items-center gap-1 shadow-2xs"
-          >
-            <HeartHandshake className="w-4 h-4 text-teal-600" />
-            <span>Health Worker</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleDemoLogin('specialist')}
+            onClick={() => handleDemoLogin('doctor')}
             className="p-2.5 bg-white hover:bg-teal-50 border border-amber-200 hover:border-teal-300 rounded-xl text-xs font-bold text-slate-800 hover:text-teal-900 transition flex flex-col items-center gap-1 shadow-2xs"
           >
             <Stethoscope className="w-4 h-4 text-teal-600" />
-            <span>Specialist</span>
+            <span>Doctor</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleDemoLogin('admin')}
+            className="p-2.5 bg-white hover:bg-teal-50 border border-amber-200 hover:border-teal-300 rounded-xl text-xs font-bold text-slate-800 hover:text-teal-900 transition flex flex-col items-center gap-1 shadow-2xs"
+          >
+            <ShieldCheck className="w-4 h-4 text-teal-600" />
+            <span>Admin</span>
           </button>
         </div>
       </div>

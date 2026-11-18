@@ -6,7 +6,7 @@ import { authMiddleware, AuthenticatedRequest } from '../middleware/auth.js';
 const router = Router();
 
 const demoLoginSchema = z.object({
-  role: z.enum(['parent', 'health_worker', 'specialist']),
+  role: z.enum(['parent', 'doctor', 'admin', 'specialist']),
 });
 
 router.post('/demo-login', (req: Request, res: Response) => {
@@ -16,24 +16,24 @@ router.post('/demo-login', (req: Request, res: Response) => {
     return;
   }
 
-  const role = parsed.data.role;
-  const user = mockProfiles.find((p) => p.role === role);
+  const targetRole = parsed.data.role === 'specialist' ? 'doctor' : parsed.data.role;
+  const user = mockProfiles.find((p) => p.role === targetRole);
   if (!user) {
     res.status(404).json({ error: 'Demo user profile not found.' });
     return;
   }
 
   const token =
-    role === 'parent'
+    targetRole === 'parent'
       ? 'demo-parent'
-      : role === 'health_worker'
-      ? 'demo-health-worker'
-      : 'demo-specialist';
+      : targetRole === 'doctor'
+      ? 'demo-doctor'
+      : 'demo-admin';
 
   res.json({
     token,
     user,
-    message: `Logged in as Demo ${role.replace('_', ' ').toUpperCase()}`,
+    message: `Logged in as Demo ${targetRole.toUpperCase()}`,
   });
 });
 

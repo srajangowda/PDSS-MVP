@@ -12,7 +12,7 @@ interface AuthContextType {
   user: UserProfile | null;
   token: string | null;
   isLoading: boolean;
-  loginWithDemo: (role: 'parent' | 'health_worker' | 'specialist') => Promise<void>;
+  loginWithDemo: (role: 'parent' | 'doctor' | 'admin' | 'specialist') => Promise<void>;
   loginWithSupabase: (email: string, pass: string) => Promise<void>;
   registerWithSupabase: (name: string, email: string, pass: string, role: UserRole) => Promise<void>;
   logout: () => void;
@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initAuth();
   }, []);
 
-  const loginWithDemo = async (role: 'parent' | 'health_worker' | 'specialist') => {
+  const loginWithDemo = async (role: 'parent' | 'doctor' | 'admin' | 'specialist') => {
     setIsLoading(true);
     try {
       const { token, user } = await api.demoLogin(role);
@@ -75,10 +75,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       // Demo mock fallback if Supabase not connected
-      if (email.includes('worker') || email.includes('asha')) {
-        await loginWithDemo('health_worker');
-      } else if (email.includes('specialist') || email.includes('dr')) {
-        await loginWithDemo('specialist');
+      if (email.includes('doctor') || email.includes('specialist') || email.includes('dr')) {
+        await loginWithDemo('doctor');
+      } else if (email.includes('admin')) {
+        await loginWithDemo('admin');
       } else {
         await loginWithDemo('parent');
       }
@@ -108,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       // Demo auto-registration fallback
-      await loginWithDemo(role === 'specialist' ? 'specialist' : role === 'health_worker' ? 'health_worker' : 'parent');
+      await loginWithDemo(role === 'doctor' ? 'doctor' : role === 'admin' ? 'admin' : 'parent');
     } finally {
       setIsLoading(false);
     }

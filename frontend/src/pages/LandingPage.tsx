@@ -19,10 +19,10 @@ export const LandingPage: React.FC = () => {
   const { user, loginWithDemo } = useAuth();
   const navigate = useNavigate();
 
-  const handleDemoAccess = async (role: 'parent' | 'health_worker' | 'specialist') => {
+  const handleDemoAccess = async (role: 'parent' | 'doctor' | 'admin') => {
     await loginWithDemo(role);
-    if (role === 'specialist') {
-      navigate('/specialist/dashboard');
+    if (role === 'doctor') {
+      navigate('/doctor/dashboard');
     } else {
       navigate('/dashboard');
     }
@@ -43,7 +43,7 @@ export const LandingPage: React.FC = () => {
           </h1>
 
           <p className="text-base sm:text-lg lg:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed font-normal">
-            AI-assisted developmental pre-screening and referral support for children aged 0–5, empowering families and frontline health workers in underserved communities.
+            AI-assisted developmental pre-screening and direct referral support for children aged 0–5, connecting parents directly with pediatric doctors.
           </p>
 
           {/* Action CTAs */}
@@ -76,7 +76,7 @@ export const LandingPage: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-amber-800/90 mb-3">
-                Instantly explore the end-to-end workflow with pre-seeded children, questionnaires, and specialists:
+                Instantly explore the end-to-end workflow with pre-seeded children, questionnaires, and doctors:
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <button
@@ -87,18 +87,18 @@ export const LandingPage: React.FC = () => {
                   Try Demo Parent
                 </button>
                 <button
-                  onClick={() => handleDemoAccess('health_worker')}
-                  className="px-3 py-2 bg-white hover:bg-teal-50 border border-amber-200 hover:border-teal-300 rounded-xl text-xs font-bold text-slate-800 hover:text-teal-900 transition flex items-center justify-center gap-1.5 shadow-xs"
-                >
-                  <HeartHandshake className="w-3.5 h-3.5 text-teal-600" />
-                  Try Health Worker
-                </button>
-                <button
-                  onClick={() => handleDemoAccess('specialist')}
+                  onClick={() => handleDemoAccess('doctor')}
                   className="px-3 py-2 bg-white hover:bg-teal-50 border border-amber-200 hover:border-teal-300 rounded-xl text-xs font-bold text-slate-800 hover:text-teal-900 transition flex items-center justify-center gap-1.5 shadow-xs"
                 >
                   <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
-                  Try Specialist
+                  Try Doctor
+                </button>
+                <button
+                  onClick={() => handleDemoAccess('admin')}
+                  className="px-3 py-2 bg-white hover:bg-teal-50 border border-amber-200 hover:border-teal-300 rounded-xl text-xs font-bold text-slate-800 hover:text-teal-900 transition flex items-center justify-center gap-1.5 shadow-xs"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+                  Try Admin
                 </button>
               </div>
             </div>
@@ -143,9 +143,9 @@ export const LandingPage: React.FC = () => {
             </div>
             <div className="bg-slate-800/80 p-5 rounded-2xl border border-slate-700/80 space-y-2">
               <div className="w-9 h-9 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center font-bold">4</div>
-              <h3 className="font-bold text-sm text-white">Frontline Support Gap</h3>
+              <h3 className="font-bold text-sm text-white">Direct Access Barrier</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                ASHA and Anganwadi community workers need fast, age-calibrated screening support on their phones.
+                Parents lack direct, structured communication channels to share objective developmental observations with pediatric doctors.
               </p>
             </div>
           </div>
@@ -160,7 +160,7 @@ export const LandingPage: React.FC = () => {
             How It Works in 4 Simple Steps
           </h2>
           <p className="text-slate-600 text-sm">
-            Designed for non-clinical parents and community health workers to screen and refer with confidence.
+            Designed for parents to screen milestones and connect directly with pediatric doctors with confidence.
           </p>
         </div>
 

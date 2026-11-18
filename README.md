@@ -12,13 +12,13 @@
 - **Specialist Concentration:** In developing and rural regions, developmental pediatricians, speech pathologists, and child psychologists are clustered in tier-1 metro hospitals.
 - **Missed Interventions:** 85% of brain architecture is established by age 3, yet signs of developmental delay are often missed until school age (5–6 years).
 - **Clinical Jargon Barrier:** Standard medical reports can frighten parents and create undue anxiety.
-- **Frontline Health Worker Need:** Community health workers (e.g. ASHA, Anganwadi) lack calibrated, easy-to-use digital screening instruments on mobile devices.
+- **Direct Access Barrier:** Parents lack a direct, streamlined channel to screen early developmental milestones and connect directly with pediatric doctors.
 
 ### The PediPulse Solution
 1. **Age-Calibrated Pre-Screening:** Intuitively calculates exact age in months and administers non-jargon milestone checklists across 6 core domains.
 2. **Deterministic Scoring Engine:** Evaluates domain status using rule-based calculations without LLM hallucinations.
 3. **AI Educational Insights:** Server-side Gemini translation breaks down results into plain parental guidance, home play routines, and structured questions for pediatric visits.
-4. **Referral Coordination:** Connects families directly to local pediatric specialists and free community screening camps.
+4. **Direct Doctor Referrals:** Connects parents directly to local pediatric doctors, specialists, and free community screening camps.
 5. **Timeline & Follow-up Tracking:** Automatically establishes post-screening check-ins and tracks patient appointment status.
 
 ---
@@ -33,9 +33,9 @@
 - **Official Printable Report:** Clean, printable PDF/document preview with official non-diagnostic medical disclaimer.
 - **Specialist & Camp Directory:** Searchable directory with filters for location, medical specialty, and free community screening camps.
 - **Referral Workflow:** Complete 5-stage progress pipeline (`Screening` → `Referral` → `Appointment` → `Assessment` → `Follow-up`).
-- **Specialist Consultation Portal:** Clinical view enabling specialists to review summaries with protected patient PII, confirm appointments, or decline referrals.
+- **Doctor Consultation Portal:** Clinical view enabling pediatric doctors to review summaries with protected patient PII, confirm appointments, or coordinate consultations.
 - **Follow-up Reminders:** Dedicated check-in tracking with one-click completion.
-- **1-Click Demo Persona Switcher:** Built-in switcher allowing judges to instantly evaluate Parent, Health Worker, and Specialist roles.
+- **1-Click Demo Persona Switcher:** Built-in switcher allowing judges to instantly evaluate Parent, Doctor, and Admin roles.
 
 ---
 
@@ -177,6 +177,6 @@ You can evaluate the application end-to-end via the UI:
 5. Click **"Complete Screening"** → review deterministic domain breakdown
 6. Click **"Get AI Explanation"** → inspect educational advice and doctor questions
 7. Click **"Find Specialist"** → select a specialist or camp slot → click **"Request Referral"**
-8. Switch persona to **Specialist** (Dr. Ananya Rao) → accept the referral in the **Specialist Hub**
+8. Switch persona to **Doctor** (Dr. Ananya Rao) → review and accept the referral in the **Doctor Hub**
 9. Switch back to **Parent** → see the updated status in **Referrals** and the check-in date in **Follow-ups**!
 

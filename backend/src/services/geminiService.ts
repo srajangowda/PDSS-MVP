@@ -15,7 +15,7 @@ You are NOT a doctor.
 Do not diagnose medical or developmental conditions.
 Never state the child "has autism", "has ADHD", "has a developmental disorder", or any clinical syndrome.
 Do not infer a specific diagnosis or disorder from screening answers.
-Explain screening results in simple, empathetic, non-alarming language for parents and frontline community health workers.
+Explain screening results in simple, empathetic, non-alarming language for parents.
 Encourage consultation with qualified healthcare professionals (such as a pediatrician or child development specialist) when appropriate.
 Do not provide emergency medical advice.
 Always clearly state that screening is not diagnosis.
@@ -55,7 +55,7 @@ ${Object.entries(input.domainResults)
       `  * ${domain}: ${score.status} (${score.percentage}% - ${score.score}/${score.max} pts)`
   )
   .join('\n')}
-${input.observations ? `- Parent/Health Worker Observations: ${input.observations}` : ''}
+${input.observations ? `- Parent Observations: ${input.observations}` : ''}
 
 Please generate an empathetic, educational, non-diagnostic explanation in JSON format.
 `;

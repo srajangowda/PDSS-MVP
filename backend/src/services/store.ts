@@ -34,17 +34,17 @@ export const mockProfiles: UserProfile[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: '22222222-2222-2222-2222-222222222222',
-    name: 'Sister Mary Fernandez (ASHA)',
-    email: 'worker@pedipulse.org',
-    role: 'health_worker',
+    id: '33333333-3333-3333-3333-333333333333',
+    name: 'Dr. Ananya Rao',
+    email: 'doctor@pedipulse.org',
+    role: 'doctor',
     created_at: new Date().toISOString(),
   },
   {
-    id: '33333333-3333-3333-3333-333333333333',
-    name: 'Dr. Ananya Rao',
-    email: 'specialist@pedipulse.org',
-    role: 'specialist',
+    id: '44444444-4444-4444-4444-444444444444',
+    name: 'Admin Coordinator',
+    email: 'admin@pedipulse.org',
+    role: 'admin',
     created_at: new Date().toISOString(),
   },
 ];
@@ -167,7 +167,7 @@ export const mockSpecialists: Specialist[] = [
     name: 'Udupi Rural Child Development Screening Camp',
     specialization: 'Pediatrician',
     location: 'Udupi',
-    bio: 'Free multi-disciplinary developmental screening camp organized with ASHA community workers.',
+    bio: 'Free multi-disciplinary developmental screening camp organized with local pediatric doctors and clinics.',
     is_active: true,
     type: 'camp',
     organization: 'District Early Intervention Center (DEIC)',
@@ -237,7 +237,7 @@ export let mockChildren: Child[] = [
   },
   {
     id: 'c3333333-cccc-cccc-cccc-cccccccccccc',
-    parent_id: '22222222-2222-2222-2222-222222222222',
+    parent_id: '11111111-1111-1111-1111-111111111111',
     name: 'Aarav Hegde',
     dob: '2026-02-12',
     gender: 'Male',
@@ -555,8 +555,8 @@ export const store = {
         mockChildren.filter((c) => c.parent_id === userId).map((c) => c.id)
       );
       list = list.filter((r) => parentChildIds.has(r.child_id));
-    } else if (role === 'specialist') {
-      list = list.filter((r) => r.specialist_id === userId || r.specialist_id.startsWith('51'));
+    } else if (role === 'doctor' || role === 'specialist') {
+      list = list.filter((r) => r.specialist_id === userId || r.specialist_id.startsWith('51') || r.specialist_id.startsWith('33'));
     }
 
     // Hydrate relations

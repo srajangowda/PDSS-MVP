@@ -31,7 +31,7 @@ async function handleResponse<T>(res: Response): Promise<T> {
 
 export const api = {
   // Auth
-  async demoLogin(role: 'parent' | 'health_worker' | 'specialist'): Promise<{
+  async demoLogin(role: 'parent' | 'doctor' | 'admin' | 'specialist'): Promise<{
     token: string;
     user: UserProfile;
   }> {

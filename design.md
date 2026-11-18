@@ -21,7 +21,7 @@ The platform centers around this loop:
 ## 2. System Architecture
 
 ```text
-       [ Parent / Health Worker / Specialist ]
+       [ Parent / Doctor / Admin ]
                          │
                  HTTPS (Port 3000)
                          │
@@ -53,9 +53,9 @@ The platform centers around this loop:
 
 | Role | Permissions & Capabilities |
 | :--- | :--- |
-| **Parent** | Register, add and manage own children, complete screening, view results, access AI explanations, find specialists/camps, submit referral requests, track follow-ups. |
-| **Health Worker (ASHA)** | Community health portal, screen children on behalf of rural/low-income families, generate referral requests, coordinate with local DEIC clinics. |
-| **Specialist / Admin** | Access Specialist Consultation Portal, review incoming referrals with non-disclosing PII summaries, confirm/accept appointments, manage availability and camp schedules. |
+| **Parent** | Register, add and manage own children, complete screening, view results, access AI explanations, find doctors and screening camps, submit direct referral requests, track follow-ups. |
+| **Doctor** | Access Doctor Consultation Portal, review incoming referrals with non-disclosing PII summaries, confirm/accept appointments, coordinate consultations. |
+| **Admin** | Full system administration, clinic directory maintenance, camp schedule management, audit oversight. |
 
 ---
 

@@ -33,12 +33,12 @@ export async function authMiddleware(
     next();
     return;
   }
-  if (token === 'demo-worker' || token === 'demo-health-worker') {
+  if (token === 'demo-doctor' || token === 'demo-specialist') {
     req.user = mockProfiles[1];
     next();
     return;
   }
-  if (token === 'demo-specialist' || token === 'demo-admin') {
+  if (token === 'demo-admin') {
     req.user = mockProfiles[2];
     next();
     return;

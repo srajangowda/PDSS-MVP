@@ -6,8 +6,8 @@
 INSERT INTO profiles (id, name, email, role)
 VALUES
   ('11111111-1111-1111-1111-111111111111', 'Sunita Sharma', 'parent@pedipulse.org', 'parent'),
-  ('22222222-2222-2222-2222-222222222222', 'Sister Mary Fernandez (ASHA)', 'worker@pedipulse.org', 'health_worker'),
-  ('33333333-3333-3333-3333-333333333333', 'Dr. Ananya Rao', 'specialist@pedipulse.org', 'specialist')
+  ('33333333-3333-3333-3333-333333333333', 'Dr. Ananya Rao', 'doctor@pedipulse.org', 'doctor'),
+  ('44444444-4444-4444-4444-444444444444', 'Admin Coordinator', 'admin@pedipulse.org', 'admin')
 ON CONFLICT (id) DO NOTHING;
 
 -- 2. Children
@@ -15,7 +15,7 @@ INSERT INTO children (id, parent_id, name, dob, gender, location, guardian_name,
 VALUES
   ('a1111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'Rahul Sharma', '2023-08-10', 'Male', 'Udupi, Karnataka', 'Sunita Sharma', '+91 98765 43210'),
   ('b2222222-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111', 'Ananya Nayak', '2025-04-15', 'Female', 'Kundapura, Udupi', 'Pooja Nayak', '+91 98451 22334'),
-  ('c3333333-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'Aarav Hegde', '2026-02-12', 'Male', 'Karkala, Karnataka', 'Lakshmi Hegde', '+91 98860 77889')
+  ('c3333333-cccc-cccc-cccc-cccccccccccc', '11111111-1111-1111-1111-111111111111', 'Aarav Hegde', '2026-02-12', 'Male', 'Karkala, Karnataka', 'Lakshmi Hegde', '+91 98860 77889')
 ON CONFLICT (id) DO NOTHING;
 
 -- 3. Screening Questions Bank (Structured by Age Groups & 6 Domains)
@@ -141,7 +141,7 @@ VALUES
     'Udupi Rural Child Development Screening Camp',
     'Community Screening Camp',
     'Udupi',
-    'Free community developmental screening camp organized by pediatric specialists and ASHA health workers. On-site assessment and guidance.',
+    'Free community developmental screening camp organized by pediatric doctors and specialists. On-site assessment and guidance.',
     true,
     'camp',
     'District Early Intervention Center (DEIC)',

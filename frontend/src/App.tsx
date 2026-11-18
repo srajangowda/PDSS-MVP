@@ -127,15 +127,16 @@ function AppRoutes() {
             }
           />
 
-          {/* Specialist Hub */}
+          {/* Doctor Portal */}
           <Route
-            path="/specialist/dashboard"
+            path="/doctor/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['specialist', 'admin']}>
+              <ProtectedRoute allowedRoles={['doctor', 'admin']}>
                 <SpecialistDashboardPage />
               </ProtectedRoute>
             }
           />
+          <Route path="/specialist/dashboard" element={<Navigate to="/doctor/dashboard" replace />} />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

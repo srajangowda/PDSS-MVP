@@ -91,15 +91,13 @@ export const DashboardPage: React.FC = () => {
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs font-semibold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-full w-fit border border-teal-200/60">
             <span className="w-2 h-2 rounded-full bg-teal-500"></span>
-            {user?.role === 'health_worker' ? 'Frontline Community Health Portal' : 'Family Health Dashboard'}
+            Family Health Dashboard
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             {getGreeting()}, {user?.name || 'Caregiver'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500">
-            {user?.role === 'health_worker'
-              ? 'Perform age-appropriate developmental pre-screenings and coordinate referrals for community children.'
-              : 'Monitor developmental milestones for your children and connect with specialists when needed.'}
+            Monitor developmental milestones for your children and connect directly with pediatric doctors when needed.
           </p>
         </div>
 

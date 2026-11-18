@@ -91,13 +91,13 @@ export const SpecialistDashboardPage: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-teal-700 bg-teal-50 px-2.5 py-1 rounded-full w-fit border border-teal-200/60 mb-1">
             <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
-            Specialist Clinical Workspace
+            Doctor Clinical Workspace
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Specialist Consultation Portal
+            Doctor Consultation Portal
           </h1>
           <p className="text-xs sm:text-sm text-slate-500">
-            Review pediatric pre-screening summaries, accept community referrals, and coordinate consultations
+            Review pediatric pre-screening summaries, accept direct parent referrals, and coordinate consultations
           </p>
         </div>
 

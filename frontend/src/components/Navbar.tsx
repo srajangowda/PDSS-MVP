@@ -21,20 +21,20 @@ export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [demoDropdownOpen, setDemoDropdownOpen] = useState(false);
 
-  const handleRoleSwitch = async (role: 'parent' | 'health_worker' | 'specialist') => {
+  const handleRoleSwitch = async (role: 'parent' | 'doctor' | 'admin') => {
     setDemoDropdownOpen(false);
     await loginWithDemo(role);
-    if (role === 'specialist') {
-      navigate('/specialist/dashboard');
+    if (role === 'doctor') {
+      navigate('/doctor/dashboard');
     } else {
       navigate('/dashboard');
     }
   };
 
   const navLinks = user
-    ? user.role === 'specialist'
+    ? user.role === 'doctor'
       ? [
-          { name: 'Specialist Hub', path: '/specialist/dashboard', icon: Stethoscope },
+          { name: 'Doctor Hub', path: '/doctor/dashboard', icon: Stethoscope },
           { name: 'Referral Pipeline', path: '/referrals', icon: ClipboardList },
           { name: 'Specialist Directory', path: '/specialists', icon: Users },
         ]
@@ -52,7 +52,7 @@ export const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo */}
-          <Link to={user ? (user.role === 'specialist' ? '/specialist/dashboard' : '/dashboard') : '/'} className="flex items-center gap-2.5">
+          <Link to={user ? (user.role === 'doctor' ? '/doctor/dashboard' : '/dashboard') : '/'} className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20">
               <Activity className="w-5 h-5 stroke-[2.5]" />
             </div>
@@ -117,18 +117,18 @@ export const Navbar: React.FC = () => {
                     {user?.role === 'parent' && <span className="text-[10px] font-bold text-teal-600">Active</span>}
                   </button>
                   <button
-                    onClick={() => handleRoleSwitch('health_worker')}
+                    onClick={() => handleRoleSwitch('doctor')}
                     className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-teal-50 hover:text-teal-900 flex items-center justify-between"
                   >
-                    <span>Health Worker (ASHA Mary)</span>
-                    {user?.role === 'health_worker' && <span className="text-[10px] font-bold text-teal-600">Active</span>}
+                    <span>Doctor (Dr. Ananya Rao)</span>
+                    {user?.role === 'doctor' && <span className="text-[10px] font-bold text-teal-600">Active</span>}
                   </button>
                   <button
-                    onClick={() => handleRoleSwitch('specialist')}
+                    onClick={() => handleRoleSwitch('admin')}
                     className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-teal-50 hover:text-teal-900 flex items-center justify-between"
                   >
-                    <span>Specialist (Dr. Ananya Rao)</span>
-                    {user?.role === 'specialist' && <span className="text-[10px] font-bold text-teal-600">Active</span>}
+                    <span>Admin (Coordinator)</span>
+                    {user?.role === 'admin' && <span className="text-[10px] font-bold text-teal-600">Active</span>}
                   </button>
                 </div>
               )}

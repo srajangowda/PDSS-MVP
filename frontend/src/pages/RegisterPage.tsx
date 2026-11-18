@@ -18,7 +18,11 @@ export const RegisterPage: React.FC = () => {
     setError(null);
     try {
       await registerWithSupabase(name, email, password, role);
-      navigate('/dashboard');
+      if (role === 'doctor') {
+        navigate('/doctor/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     }
@@ -128,23 +132,23 @@ export const RegisterPage: React.FC = () => {
 
               <label
                 className={`flex flex-col p-3 rounded-xl border cursor-pointer transition text-left ${
-                  role === 'health_worker'
+                  role === 'doctor'
                     ? 'border-teal-500 bg-teal-50/60 ring-2 ring-teal-500/20'
                     : 'border-slate-200 bg-slate-50 hover:bg-slate-100/50'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-slate-900">Health Worker (ASHA)</span>
+                  <span className="text-xs font-bold text-slate-900">Doctor / Pediatrician</span>
                   <input
                     type="radio"
                     name="role"
-                    value="health_worker"
-                    checked={role === 'health_worker'}
-                    onChange={() => setRole('health_worker')}
+                    value="doctor"
+                    checked={role === 'doctor'}
+                    onChange={() => setRole('doctor')}
                     className="text-teal-600 focus:ring-teal-500"
                   />
                 </div>
-                <span className="text-[11px] text-slate-500 leading-tight">Community screening on behalf of families</span>
+                <span className="text-[11px] text-slate-500 leading-tight">Review screening reports and manage referrals</span>
               </label>
             </div>
           </div>

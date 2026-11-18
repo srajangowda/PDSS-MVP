@@ -17,7 +17,7 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4 pt-4 border-t border-slate-800">
-          <p>© {new Date().getFullYear()} PediPulse Platform. Designed for underserved communities & frontline child healthcare.</p>
+          <p>© {new Date().getFullYear()} PediPulse Platform. Direct parent-to-doctor pediatric developmental care.</p>
           <div className="flex items-center gap-6">
             <span>Privacy & Confidentiality Protected</span>
             <span className="flex items-center gap-1">Built with care for 0–5 year olds <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline" /></span>
