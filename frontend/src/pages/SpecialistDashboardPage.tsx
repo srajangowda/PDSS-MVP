@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { Referral, Screening } from '../types';
 import { CardSkeleton } from '../components/LoadingSkeleton';
@@ -16,6 +17,7 @@ import {
   ShieldCheck,
   Activity,
   AlertCircle,
+  TrendingUp,
 } from 'lucide-react';
 
 export const SpecialistDashboardPage: React.FC = () => {
@@ -218,6 +220,13 @@ export const SpecialistDashboardPage: React.FC = () => {
                   </div>
 
                   <div className="space-y-2 pt-2 border-t border-slate-100">
+                    <Link
+                      to={`/children/${ref.child_id}/progress`}
+                      className="w-full py-2 px-3 text-center rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs transition flex items-center justify-center gap-1.5 border border-teal-200"
+                    >
+                      <TrendingUp className="w-3.5 h-3.5 text-teal-600" />
+                      Child Progress Tracking Dashboard
+                    </Link>
                     <button
                       onClick={() => setSelectedReferral(ref)}
                       className="w-full py-2 px-3 text-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center justify-center gap-1.5"
@@ -294,6 +303,13 @@ export const SpecialistDashboardPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="py-3.5 px-5 text-right space-x-2">
+                          <Link
+                            to={`/children/${ref.child_id}/progress`}
+                            className="px-2.5 py-1 text-teal-700 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 rounded-lg font-bold border border-teal-200 inline-flex items-center gap-1"
+                          >
+                            <TrendingUp className="w-3 h-3" />
+                            Tracking
+                          </Link>
                           <button
                             onClick={() => setSelectedReferral(ref)}
                             className="px-2.5 py-1 text-slate-600 hover:text-slate-900 bg-slate-100 rounded-lg font-semibold"

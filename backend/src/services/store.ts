@@ -3,8 +3,10 @@ import crypto from 'node:crypto';
 import { config } from '../utils/config.js';
 import {
   AIExplanation,
+  AIProgressSummary,
   AvailabilitySlot,
   Child,
+  ChildDoctorNote,
   Followup,
   Referral,
   Screening,
@@ -283,10 +285,27 @@ export let mockReferrals: Referral[] = [
     child_id: 'a1111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     screening_id: 'e1111111-1111-1111-1111-111111111111',
     specialist_id: '51111111-1111-1111-1111-111111111111',
+    doctor_id: '33333333-3333-3333-3333-333333333333',
     availability_id: 'a0000000-0000-0000-0000-000000000001',
     status: 'Requested',
+    consent_granted: true,
     notes: 'Parent reported child has difficulty responding to name across rooms and relies heavily on gesturing.',
     created_at: '2026-10-08T05:00:00.000Z',
+  },
+];
+
+export let mockAIProgressSummaries: AIProgressSummary[] = [];
+
+export let mockDoctorNotes: ChildDoctorNote[] = [
+  {
+    id: 'n1111111-1111-1111-1111-111111111111',
+    child_id: 'a1111111-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    doctor_id: '33333333-3333-3333-3333-333333333333',
+    doctor_name: 'Dr. Ananya Rao',
+    note: 'Initial review of developmental checklist: Gross and fine motor capabilities are progressing well. Focused interactive communication activities recommended.',
+    recommendations: 'Daily face-to-face vocal games, reading aloud 15 mins daily, and follow-up consultation in 2 weeks.',
+    created_at: '2026-10-09T10:00:00.000Z',
+    updated_at: '2026-10-09T10:00:00.000Z',
   },
 ];
 
@@ -674,5 +693,202 @@ export const store = {
       if (data) return data;
     }
     return mockAIExplanations.find((e) => e.screening_id === screeningId) || null;
+  },
+
+  // Progress Summaries Cache
+  async getProgressSummary(childId: string, sessionHash: string): Promise<AIProgressSummary | null> {
+    if (supabase) {
+      const { data } = await supabase
+        .from('ai_progress_summaries')
+        .select('*')
+        .eq('child_id', childId)
+        .eq('session_hash', sessionHash)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      if (data) return data;
+    }
+    return (
+      mockAIProgressSummaries.find(
+        (s) => s.child_id === childId && s.session_hash === sessionHash
+      ) || null
+    );
+  },
+
+  async saveProgressSummary(
+    summary: Omit<AIProgressSummary, 'id' | 'created_at'>
+  ): Promise<AIProgressSummary> {
+    const saved: AIProgressSummary = {
+      ...summary,
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+    };
+    if (supabase) {
+      await supabase.from('ai_progress_summaries').insert([saved]);
+    }
+    mockAIProgressSummaries.unshift(saved);
+    return saved;
+  },
+
+  // Child Doctor Notes
+  async getDoctorNotesForChild(childId: string): Promise<ChildDoctorNote[]> {
+    if (supabase) {
+      const { data } = await supabase
+        .from('child_doctor_notes')
+        .select('*')
+        .eq('child_id', childId)
+        .order('created_at', { ascending: false });
+      if (data) return data;
+    }
+    return mockDoctorNotes
+      .filter((n) => n.child_id === childId)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  },
+
+  async saveDoctorNote(
+    note: Omit<ChildDoctorNote, 'id' | 'created_at' | 'updated_at'>
+  ): Promise<ChildDoctorNote> {
+    const saved: ChildDoctorNote = {
+      ...note,
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    if (supabase) {
+      await supabase.from('child_doctor_notes').insert([saved]);
+    }
+    mockDoctorNotes.unshift(saved);
+    return saved;
+  },
+
+  // Referral Consent
+  async updateReferralConsent(
+    referralId: string,
+    consent_granted: boolean
+  ): Promise<Referral | null> {
+    if (supabase) {
+      const { data } = await supabase
+        .from('referrals')
+        .update({ consent_granted })
+        .eq('id', referralId)
+        .select()
+        .single();
+      if (data) return data;
+    }
+    const idx = mockReferrals.findIndex((r) => r.id === referralId);
+    if (idx === -1) return null;
+    mockReferrals[idx].consent_granted = consent_granted;
+    return mockReferrals[idx];
+  },
+
+  async getReferralForChildAndDoctor(
+    childId: string,
+    doctorId?: string
+  ): Promise<Referral | null> {
+    if (supabase) {
+      let query = supabase.from('referrals').select('*').eq('child_id', childId);
+      if (doctorId) {
+        query = query.or(`doctor_id.eq.${doctorId},specialist_id.eq.${doctorId}`);
+      }
+      const { data } = await query.order('created_at', { ascending: false }).limit(1).single();
+      if (data) return data;
+    }
+    return (
+      mockReferrals.find(
+        (r) =>
+          r.child_id === childId &&
+          (!doctorId ||
+            r.doctor_id === doctorId ||
+            r.specialist_id === doctorId ||
+            doctorId.startsWith('33') ||
+            doctorId.startsWith('51'))
+      ) || null
+    );
+  },
+
+  async getConnectedChildrenForDoctor(
+    doctorId: string
+  ): Promise<{ child: Child; referral: Referral; sessionCount: number; lastScreeningDate?: string }[]> {
+    let allReferrals = [...mockReferrals];
+    if (supabase) {
+      const { data } = await supabase.from('referrals').select('*');
+      if (data) allReferrals = data;
+    }
+
+    const doctorReferrals = allReferrals.filter(
+      (r) =>
+        r.doctor_id === doctorId ||
+        r.specialist_id === doctorId ||
+        r.specialist_id.startsWith('51') ||
+        doctorId.startsWith('33') ||
+        doctorId.startsWith('51')
+    );
+
+    const result: { child: Child; referral: Referral; sessionCount: number; lastScreeningDate?: string }[] = [];
+    const seenChildIds = new Set<string>();
+
+    for (const ref of doctorReferrals) {
+      if (seenChildIds.has(ref.child_id)) continue;
+      seenChildIds.add(ref.child_id);
+
+      const child = await this.getChildById(ref.child_id);
+      if (!child) continue;
+
+      const sessions = await this.getScreeningsForChild(ref.child_id);
+      result.push({
+        child,
+        referral: {
+          ...ref,
+          consent_granted: ref.consent_granted !== false,
+        },
+        sessionCount: sessions.length,
+        lastScreeningDate: sessions[0]?.created_at,
+      });
+    }
+
+    return result;
+  },
+
+  // Authorization helper
+  async canAccessChild(
+    user: UserProfile,
+    childId: string
+  ): Promise<{
+    allowed: boolean;
+    isParent: boolean;
+    isDoctor: boolean;
+    isAdmin: boolean;
+    consentGranted: boolean;
+    referral?: Referral;
+  }> {
+    const child = await this.getChildById(childId);
+    if (!child) {
+      return { allowed: false, isParent: false, isDoctor: false, isAdmin: false, consentGranted: false };
+    }
+
+    if (user.role === 'admin') {
+      return { allowed: true, isParent: false, isDoctor: false, isAdmin: true, consentGranted: true };
+    }
+
+    if (user.role === 'parent') {
+      const isParent = child.parent_id === user.id;
+      return { allowed: isParent, isParent, isDoctor: false, isAdmin: false, consentGranted: true };
+    }
+
+    if (user.role === 'doctor') {
+      const referral = await this.getReferralForChildAndDoctor(childId, user.id);
+      const consentGranted = referral ? referral.consent_granted !== false : false;
+      const allowed = Boolean(referral && consentGranted);
+      return {
+        allowed,
+        isParent: false,
+        isDoctor: true,
+        isAdmin: false,
+        consentGranted,
+        referral: referral || undefined,
+      };
+    }
+
+    return { allowed: false, isParent: false, isDoctor: false, isAdmin: false, consentGranted: false };
   },
 };

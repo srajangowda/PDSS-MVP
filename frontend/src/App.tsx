@@ -11,6 +11,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ChildrenListPage } from './pages/ChildrenListPage';
 import { ChildDetailPage } from './pages/ChildDetailPage';
+import { ChildProgressPage } from './pages/ChildProgressPage';
 import { ScreeningPage } from './pages/ScreeningPage';
 import { ScreeningResultPage } from './pages/ScreeningResultPage';
 import { SpecialistDirectoryPage } from './pages/SpecialistDirectoryPage';
@@ -78,6 +79,15 @@ function AppRoutes() {
             element={
               <ProtectedRoute>
                 <ChildDetailPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/children/:id/progress"
+            element={
+              <ProtectedRoute allowedRoles={['parent', 'doctor', 'admin']}>
+                <ChildProgressPage />
               </ProtectedRoute>
             }
           />

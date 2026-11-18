@@ -104,9 +104,11 @@ export interface Referral {
   child_id: string;
   screening_id: string;
   specialist_id: string;
+  doctor_id?: string;
   availability_id?: string;
   status: ReferralStatus;
   notes?: string;
+  consent_granted?: boolean;
   created_at: string;
   child?: Child;
   specialist?: Specialist;
@@ -135,5 +137,61 @@ export interface AIExplanation {
   questions_for_doctor: string[];
   disclaimer: string;
   created_at: string;
+}
+
+export type TrendDirection = 'improved' | 'unchanged' | 'needs_attention';
+
+export interface DomainTrend {
+  domain: string;
+  previous_percentage: number;
+  latest_percentage: number;
+  previous_status: DomainStatus;
+  latest_status: DomainStatus;
+  trend: TrendDirection;
+  label: string;
+  delta_percentage: number;
+}
+
+export interface AIProgressSummary {
+  id: string;
+  child_id: string;
+  session_ids: string[];
+  session_hash: string;
+  summary_en: string;
+  summary_kn: string;
+  key_changes: string[];
+  disclaimer: string;
+  created_at: string;
+}
+
+export interface ChildDoctorNote {
+  id: string;
+  child_id: string;
+  doctor_id: string;
+  doctor_name: string;
+  note: string;
+  recommendations: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChildProgressData {
+  child: Child;
+  sessions: {
+    id: string;
+    date: string;
+    age_display: string;
+    overall_score: number;
+    risk_level: RiskLevel;
+    domain_scores: Record<string, DomainScore>;
+  }[];
+  trends: DomainTrend[];
+  consent: {
+    is_consented: boolean;
+    referral_id?: string;
+    doctor_name?: string;
+    doctor_id?: string;
+  };
+  doctor_notes: ChildDoctorNote[];
 }
 

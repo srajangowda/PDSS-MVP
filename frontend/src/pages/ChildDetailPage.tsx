@@ -21,6 +21,7 @@ import {
   FileText,
   AlertCircle,
   HelpCircle,
+  TrendingUp,
 } from 'lucide-react';
 
 export const ChildDetailPage: React.FC = () => {
@@ -144,6 +145,13 @@ export const ChildDetailPage: React.FC = () => {
 
         {/* Header Action Buttons */}
         <div className="flex flex-wrap items-center gap-2.5">
+          <Link
+            to={`/children/${child.id}/progress`}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 transition shadow-2xs"
+          >
+            <TrendingUp className="w-4 h-4 text-teal-600" />
+            Progress Tracking
+          </Link>
           <Link
             to={`/screening/${child.id}`}
             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 transition shadow-sm"

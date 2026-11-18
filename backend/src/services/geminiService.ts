@@ -10,6 +10,38 @@ export interface ExplainScreeningInput {
   observations?: string;
 }
 
+export interface ProgressSessionData {
+  id: string;
+  date: string;
+  age_display: string;
+  overall_score: number;
+  risk_level: RiskLevel;
+  domain_scores: Record<string, DomainScore>;
+}
+
+export interface ProgressSummaryInput {
+  childId: string;
+  childAge: string;
+  sessions: ProgressSessionData[];
+  trends: {
+    domain: string;
+    previous_percentage: number;
+    latest_percentage: number;
+    previous_status: string;
+    latest_status: string;
+    trend: 'improved' | 'unchanged' | 'needs_attention';
+    label: string;
+    delta_percentage: number;
+  }[];
+}
+
+export interface GeneratedProgressSummaryResult {
+  summary_en: string;
+  summary_kn: string;
+  key_changes: string[];
+  disclaimer: string;
+}
+
 const SYSTEM_PROMPT = `You are an educational developmental screening explanation assistant for PediPulse.
 You are NOT a doctor.
 Do not diagnose medical or developmental conditions.
@@ -143,6 +175,142 @@ export function getDeterministicFallbackExplanation(
     questions_for_doctor: doctorQuestions,
     disclaimer:
       'This AI-assisted explanation is for educational purposes only and does not constitute a medical diagnosis or clinical advice. Please consult a qualified healthcare professional for formal evaluation.',
+  };
+}
+
+const PROGRESS_SUMMARY_SYSTEM_PROMPT = `You are an educational developmental progress explanation assistant for PediPulse.
+You are NOT a doctor and must NEVER provide a medical diagnosis.
+CRITICAL SAFETY CONSTRAINTS:
+1. Strict prohibition: NEVER name medical or developmental disorders or conditions (such as "autism", "ASD", "ADHD", "cerebral palsy", "intellectual disability", "developmental disorder", or any clinical syndrome).
+2. Forbid diagnostic statements: Do not say the child "has" or "suffers from" any condition.
+3. Plain language only: Describe observations objectively in terms of everyday developmental activities (e.g., communication, motor skills, social play, daily self-care).
+4. Bilingual Requirement: Provide a concise, plain-language summary of developmental changes in both English (summary_en) and natural Kannada / ಕನ್ನಡ (summary_kn).
+5. Mandatory ending: BOTH the English and Kannada summaries MUST end with a clear statement advising the parent to consult a doctor or qualified pediatrician for professional advice.
+6. The disclaimer MUST be: "This is a pre-screening summary, not a medical diagnosis."
+
+Respond ONLY with valid JSON in this exact structure:
+{
+  "summary_en": "Plain English summary describing changes and progress across sessions, ending with a recommendation to consult a doctor.",
+  "summary_kn": "ಸರಳ ಕನ್ನಡದಲ್ಲಿ ಹಿಂದಿನ ಮತ್ತು ಇತ್ತೀಚಿನ ಅವಧಿಗಳ ಬದಲಾವಣೆಗಳ ಸಾರಾಂಶ, ಕೊನೆಯಲ್ಲಿ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಲು ಸ್ಪಷ್ಟ ಸಲಹೆ.",
+  "key_changes": [
+    "Key change 1 in plain English",
+    "Key change 2 in plain English"
+  ],
+  "disclaimer": "This is a pre-screening summary, not a medical diagnosis."
+}`;
+
+export async function generateAIProgressSummary(
+  input: ProgressSummaryInput
+): Promise<GeneratedProgressSummaryResult> {
+  const disclaimerText = 'This is a pre-screening summary, not a medical diagnosis.';
+
+  if (config.hasGemini) {
+    try {
+      const genAI = new GoogleGenerativeAI(config.geminiApiKey);
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        generationConfig: {
+          responseMimeType: 'application/json',
+          temperature: 0.3,
+        },
+      });
+
+      const trendsOverview = input.trends
+        .map(
+          (t) =>
+            `- ${t.domain}: ${t.label} (Previous: ${t.previous_status} [${t.previous_percentage}%] -> Latest: ${t.latest_status} [${t.latest_percentage}%], Change: ${t.delta_percentage >= 0 ? '+' : ''}${t.delta_percentage}%)`
+        )
+        .join('\n');
+
+      const sessionHistory = input.sessions
+        .map(
+          (s, idx) =>
+            `Session ${idx + 1} (${s.date}, Age: ${s.age_display}): Overall Status: ${s.risk_level}, Total Score: ${s.overall_score}`
+        )
+        .join('\n');
+
+      const promptText = `
+Screening Sessions Count: ${input.sessions.length}
+Child Current Age Band: ${input.childAge}
+
+Session Milestones Timeline:
+${sessionHistory}
+
+Domain Trend Breakdown (Scoring Rules):
+${trendsOverview}
+
+Please generate an empathetic, plain-language comparative progress summary in both English and Kannada according to the safety rules.
+`;
+
+      const result = await model.generateContent([
+        { text: PROGRESS_SUMMARY_SYSTEM_PROMPT },
+        { text: promptText },
+      ]);
+
+      const responseText = result.response.text();
+      const parsed = JSON.parse(responseText);
+
+      return {
+        summary_en: parsed.summary_en || 'Progress observations across screening sessions show developmental changes. Please consult a qualified doctor for personalized guidance.',
+        summary_kn: parsed.summary_kn || 'ಪೂರ್ವ-ತಪಾಸಣಾ ಅವಧಿಗಳ ನಡುವಿನ ಬದಲಾವಣೆಗಳನ್ನು ಗಮನಿಸಲಾಗಿದೆ. ಸಮಗ್ರ ಮತ್ತು ಸೂಕ್ತ ಮಾರ್ಗದರ್ಶನಕ್ಕಾಗಿ ದಯವಿಟ್ಟು ಮಕ್ಕಳ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.',
+        key_changes: Array.isArray(parsed.key_changes) ? parsed.key_changes : [],
+        disclaimer: disclaimerText,
+      };
+    } catch (err: any) {
+      console.warn('Gemini progress summary call failed or quota reached, using safe deterministic fallback.');
+    }
+  }
+
+  return getDeterministicProgressSummaryFallback(input);
+}
+
+export function getDeterministicProgressSummaryFallback(
+  input: ProgressSummaryInput
+): GeneratedProgressSummaryResult {
+  const improved = input.trends.filter((t) => t.trend === 'improved');
+  const needsAttention = input.trends.filter((t) => t.trend === 'needs_attention');
+  const unchanged = input.trends.filter((t) => t.trend === 'unchanged');
+
+  const keyChanges: string[] = [];
+
+  if (improved.length > 0) {
+    const domains = improved.map((t) => t.domain).join(', ');
+    keyChanges.push(`Progress noted in ${domains} with positive milestone gains.`);
+  }
+
+  if (needsAttention.length > 0) {
+    const domains = needsAttention.map((t) => t.domain).join(', ');
+    keyChanges.push(`Continued attention and interactive play recommended for ${domains}.`);
+  }
+
+  if (unchanged.length > 0) {
+    const domains = unchanged.map((t) => t.domain).join(', ');
+    keyChanges.push(`Steady, consistent milestone performance maintained in ${domains}.`);
+  }
+
+  let summary_en = '';
+  if (improved.length > 0 && needsAttention.length === 0) {
+    summary_en = `Across recent screening sessions, your child demonstrates encouraging progress with positive gains across evaluated areas such as ${improved.map(i => i.domain).join(', ')}. Continue nurturing daily play and interactive routines, and please consult your doctor for personalized advice during regular checkups.`;
+  } else if (needsAttention.length > 0) {
+    summary_en = `Comparing screening sessions shows active developmental areas alongside specific domains (${needsAttention.map(n => n.domain).join(', ')}) that may benefit from structured home play and close observation. This is an early pre-screening tool; please consult a qualified doctor or pediatrician for professional clinical guidance.`;
+  } else {
+    summary_en = `Developmental screening sessions show steady and consistent milestone progress across observed areas for this age stage. Keep encouraging open-ended play and bonding routines, and consult your doctor for routine wellness reviews.`;
+  }
+
+  let summary_kn = '';
+  if (improved.length > 0 && needsAttention.length === 0) {
+    summary_kn = `ಹಿಂದಿನ ಮತ್ತು ಇತ್ತೀಚಿನ ಪೂರ್ವ-ತಪಾಸಣೆಯ ಅವಧಿಗಳ ನಡುವೆ, ನಿಮ್ಮ ಮಗು ${improved.map(i => i.domain).join(', ')} ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಉತ್ತಮ ಬೆಳವಣಿಗೆ ಮತ್ತು ಪ್ರಗತಿಯನ್ನು ಪ್ರದರ್ಶಿಸಿದೆ. ದಿನನಿತ್ಯದ ಆಟ ಮತ್ತು ಸಂವಹನ ಚಟುವಟಿಕೆಗಳನ್ನು ಮುಂದುವರಿಸಿ, ಹಾಗೂ ಸೂಕ್ತ ಸಲಹೆಗಾಗಿ ಮಕ್ಕಳ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+  } else if (needsAttention.length > 0) {
+    summary_kn = `ಪೂರ್ವ-ತಪಾಸಣೆಯ ಅವಧಿಗಳ ಹೋಲಿಕೆಯು ಮಗುವಿನ ಸಕ್ರಿಯ ಬೆಳವಣಿಗೆಯೊಂದಿಗೆ ${needsAttention.map(n => n.domain).join(', ')} ಕ್ಷೇತ್ರಗಳಲ್ಲಿ ಹೆಚ್ಚಿನ ಗಮನ ಮತ್ತು ಪ್ರೋತ್ಸಾಹದ ಅಗತ್ಯವನ್ನು ಸೂಚಿಸುತ್ತದೆ. ಸೂಕ್ತ ವೈದ್ಯಕೀಯ ಮಾರ್ಗದರ್ಶನಕ್ಕಾಗಿ ದಯವಿಟ್ಟು ಮಕ್ಕಳ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+  } else {
+    summary_kn = `ಪೂರ್ವ-ತಪಾಸಣಾ ಅವಧಿಗಳಲ್ಲಿ ಮಗುವಿನ ಬೆಳವಣಿಗೆಯು ಸ್ಥಿರ ಮತ್ತು ನಿರಂತರ ಪ್ರಗತಿಯನ್ನು ತೋರಿಸುತ್ತಿದೆ. ಮಗುವಿನೊಂದಿಗೆ ಆಟವಾಡುವ ಮತ್ತು ಕಥೆ ಹೇಳುವ ದಿನನಿತ್ಯದ ಅಭ್ಯಾಸಗಳನ್ನು ಮುಂದುವರಿಸಿ, ಹಾಗೂ ನಿಯಮಿತ ತಪಾಸಣೆಗಾಗಿ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.`;
+  }
+
+  return {
+    summary_en,
+    summary_kn,
+    key_changes: keyChanges.length > 0 ? keyChanges : ['Consistent milestone tracking recorded across screening sessions.'],
+    disclaimer: 'This is a pre-screening summary, not a medical diagnosis.',
   };
 }
 

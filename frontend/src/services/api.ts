@@ -2,6 +2,8 @@ import {
   AIExplanation,
   AvailabilitySlot,
   Child,
+  ChildDoctorNote,
+  ChildProgressData,
   Followup,
   Referral,
   Screening,
@@ -259,6 +261,61 @@ export const api = {
       method: 'PATCH',
       headers: getAuthHeaders(),
       body: JSON.stringify({ status }),
+    });
+    return handleResponse(res);
+  },
+
+  // Progress Tracking & Multi-session Trends
+  async getChildProgress(childId: string): Promise<ChildProgressData & { disclaimer: string }> {
+    const res = await fetch(`${API_BASE}/screening/progress/${childId}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  async getChildProgressSummary(childId: string): Promise<{
+    summary_en: string;
+    summary_kn: string;
+    key_changes: string[];
+    disclaimer: string;
+    cached: boolean;
+  }> {
+    const res = await fetch(`${API_BASE}/screening/progress-summary/${childId}`, {
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  async updateConsent(
+    referralId: string,
+    consent_granted: boolean
+  ): Promise<{ success: boolean; referral_id: string; consent_granted: boolean; message: string }> {
+    const res = await fetch(`${API_BASE}/screening/consent/${referralId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ consent_granted }),
+    });
+    return handleResponse(res);
+  },
+
+  async addDoctorNote(
+    childId: string,
+    note: string,
+    recommendations?: string
+  ): Promise<ChildDoctorNote> {
+    const res = await fetch(`${API_BASE}/screening/notes/${childId}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ note, recommendations }),
+    });
+    return handleResponse(res);
+  },
+
+  async getConnectedChildren(): Promise<
+    { child: Child; referral: Referral; sessionCount: number; lastScreeningDate?: string }[]
+  > {
+    const res = await fetch(`${API_BASE}/screening/doctor/connected-children`, {
+      headers: getAuthHeaders(),
     });
     return handleResponse(res);
   },

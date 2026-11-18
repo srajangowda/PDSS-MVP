@@ -47,7 +47,8 @@ app.use(errorHandler);
 
 // Listen only when run standalone (not as Vercel serverless function)
 const isServerless = Boolean(process.env.VERCEL || process.env.NOW_REGION || process.env.LAMBDA_TASK_ROOT);
-if (!isServerless && (process.argv[1]?.includes('index.ts') || process.argv[1]?.includes('dist/index.js'))) {
+const scriptPath = (process.argv[1] || '').replace(/\\/g, '/');
+if (!isServerless && (scriptPath.includes('index.ts') || scriptPath.includes('dist/index.js') || scriptPath.includes('index.js'))) {
   const PORT = config.port;
   app.listen(PORT, () => {
     console.log(`=========================================`);
